@@ -1,0 +1,69 @@
+
+Reference
+
+DDR  - 0 = INPUT , 1 = OUTPUT
+PIN  - INPUT
+PORT - OUTPUT
+
+PORTB / PINB / DDRB / PCMSK0 | digital pins [8,13]
+PB0 ( ICP1  / PCINT0 / CLKO  ) 8
+PB1 ( OC1A  / PCINT1         ) 9
+PB2 ( OC1B  / PCINT2 / SS    ) 10
+PB3 ( OC2A  / PCINT3 / MOSI  ) 11
+PB4 (         PCINT4 / MISO  ) 12
+PB5 (         PCINT5 / SCK   ) 13
+PB6 ( TOSC1 / PCINT6 / XTAL1 ) not used arduino
+PB7 ( TOSC2 / PCINT7 / XTAL2 ) not used arduino
+
+PORTC / PINC / DDRC / PCMSK1 | analog pins [0,5]
+PC0 ( ADC0  / PCINT8         ) 0
+PC1 ( ADC1  / PCINT9         ) 1
+PC2 ( ADC2  / PCINT10        ) 2
+PC3 ( ADC3  / PCINT11        ) 3
+PC4 ( ADC3  / PCINT12 / SDA  ) 4
+PC5 ( ADC5  / PCINT13 / SCL  ) 5
+PC6 ( RESET / PCINT14        ) only on mini
+
+PORTD / PIND / DDRD / PCMSK2 / digital pins [0,7]
+PD0 ( RXD   / PCINT16            ) 0
+PD1 ( TXD   / PCINT17            ) 1
+PD2 (         PCINT18 / INT0     ) 2
+PD3 ( OC2B  / PCINT19 / INT1     ) 3
+PD4 (         PCINT20 / XCK / T0 ) 4
+PD5 ( OC0B    PCINT21 /       T1 ) 5
+PD6 ( OC0A  / PCINT22 / AIN0     ) 6
+PD7 (         PCINT23 / AIN1     ) 7
+
+WGMnn - Waveform Generation Mode
+CSnn  - Clock Select, control prescaler
+OCRnA - Output Compare Register A
+OCRnB - Output Compare Register B
+COMnA - Compare Match Output A Mode
+COMnB - Compare Match Output B Mode
+OCnA  - Output Compare PORT A
+OCnB  - Output Compare PORT B
+ICRn  - Input Capture Register
+
+
+TCCR0A ( WGM00 / WGM01 / COM0B0 / COM0B1 / COM0A0 / COM0A1 )
+TCCR0B ( CS00 / CS01 / CS02 / WGM02 / FOC0B / FOC0A )
+TCCR1A ( WGM10 / WGM11 / COM1B0 / COM1B1 / COM1A0 / COM1A1 )
+TCCR1B ( CS10 / CS11 / CS12 / WGM12 / WGM13 / ICES1 / ICNC1 )
+TCCR1C ( FOC1B / FOC1A )
+TCCR2A ( WGM20 / WGM21 / COM2B0 / COM2B1 / COM2A0 / COM2A1 )
+TCCR2B ( CS20 / CS21 / CS22 / WGM22 / FOC2B / FOC2A )
+
+TIMSK0 ( TOIE0 / OCIE0A / OCIE0B         )
+TIMSK1 ( TOIE1 / OCIE1A / OCIE1B / ICIE1 )
+TIMSK2 ( TOIE2 / OCIE2A / OCIE2B         )
+
+TCNT0 ( TCNT0_[0,7] )
+TCNT1 ( TCNT1L[0,7] / TCNT1H[0,7] )
+TCNT2 ( TCNT2_[0,7] )
+
+TIFR0 ( TOV0 / OCF0A / OCF0B )
+TIFR1 ( TOV1 / OCF1A / OCF1B / ICF1 )
+TIFR2 ( TOV0 / OCF0A / OCF0B )
+
+Digital Pins are 0V-5V ( maps to {LOW,HIGH} )
+Analog Pins are 0V-5V ( maps to [0,1023] )

@@ -16,8 +16,8 @@ main ( void )
   for ( ; ; )
   {
     PORTB |= ( 1 << LED ) ;
-    _delay_ms ( 100 ) ;
+    //_delay_ms ( 100 ) ;
     PORTB &= ( 0 << LED ) ;
-    _delay_ms ( 100 ) ;
+    //_delay_ms ( 100 ) ;
   }
 }
