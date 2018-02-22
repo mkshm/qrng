@@ -7,19 +7,17 @@
 #include <avr/pgmspace.h>
 #include <avr/sfr_defs.h>
 
+#include <stdio.h>
+
 #include <mf_type.h>
 
-typedef struct rega_t
-{
-  u08 b1 : 1 ; u08 b2 : 1 ;
-  u08 b3 : 1 ; u08 b4 : 1 ;
-  u08 b5 : 1 ; u08 b6 : 1 ;
-  u08 b7 : 1 ; u08 b8 : 1 ;
-} B ;
+#include <avr/avr_mcu_section.h>
+AVR_MCU ( F_CPU , "atmega328p" ) ;
 
-enum { ON = 1 , OFF = 0 } ;
-
-_Static_assert ( 1 == sizeof ( B ) , "B is not the same size as its corresponding register." ) ;
+const struct avr_mmcu_vcd_trace_t _mytrace[]  _MMCU_ = {
+  { AVR_MCU_VCD_SYMBOL("UDR0"), .what = (void*)&UDR0, },
+  { AVR_MCU_VCD_SYMBOL("UDRE0"), .mask = (1 << UDRE0), .what = (void*)&UCSR0A, },
+};
 
 static volatile u08 over ;
 
@@ -28,13 +26,25 @@ ISR ( TIMER1_OVF_vect )
   over ++ ;
 }
 
+static int
+uart_putchar ( char c , FILE * fd )
+{
+  if ( c == '\n' ) uart_putchar ( '\r' , fd ) ;
+  loop_until_bit_is_set ( UCSR0A , UDRE0 ) ;
+  UDR0 = c ;
+  return 0 ;
+}
+
+static FILE mystdout = FDEV_SETUP_STREAM ( uart_putchar ,
+                                           NULL ,
+                                           _FDEV_SETUP_WRITE ) ;
+
 int
 main ( void )
 {
-  DD ( B ) { ON } ;
-  RD ( B ) { ON } ;
+  stdout = & mystdout ;
 
-  TCCR1B = _BV ( WGM13 ) | _BV ( CS10 ) ;
+  TCCR1B = _BV ( CS10 ) ;
   TCCR1A = 0 ;
   TIMSK1 = _BV ( TOIE1 ) ;
 
