@@ -1,0 +1,22 @@
+
+First:
+  Initialization:
+    Set timers to zero ( 4 separate timers )
+    Set timer deltas to zero ( 4 separate timer deltas )
+    4 Arrays
+  Pin setup
+  Read Pins
+  Enter Loop:
+    First loop x : 1 -> 16 ( generates random number)
+      Loop for collecting timestamps ( 4 timestamps )
+        Spin on input
+          if prev == LOW and current == HIGH
+            CONGRATULATIONS, you got one
+            Store time span
+          prev = current
+      Compute Deltas
+      Compare Deltas
+        if d2 < d1 then 1
+        if d2 > d1 then 0
+        else  call nist test --iteration 2
+    Serial Stuff ( 115200 bits/sec )
