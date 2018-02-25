@@ -12,14 +12,28 @@ set ( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake" )
 
 project ( AVR_PROJECT VERSION 0.0.1.0 LANGUAGES C CXX )
 
-set ( AVR_MCU atmega328p )
-set ( AVR_MCU_FREQ 16000000UL )
-set ( AVR_PROGRAMMER arduino )
-set ( AVR_PROGRAMMER_PORT /dev/ttyACM0 )
-set ( AVR_PROGRAMMER_BAUD 19200 )
-set ( AVR_PROGRAM_EEPROM FALSE )
+avr_add_executable ( qrng qrng.c
+  PROPERTIES
+    MCU             atmega328p
+    MCU_FREQ        16000000
+)
+avr_add_executable ( laser laser.c
+  PROPERTIES
+    MCU             atmega328p
+    MCU_FREQ        16000000
+)
 
-set ( CMAKE_C_FLAGS "-I ${CMAKE_SOURCE_DIR}/include -I /usr/include/simavr" )
+avr_target_include_directories ( qrng  ${CMAKE_SOURCE_DIR}/include )
+avr_target_include_directories ( laser ${CMAKE_SOURCE_DIR}/include )
 
-avr_add_executable ( qrng qrng.c )
-avr_add_executable ( laser laser.c )
+avr_disasm ( laser )
+avr_disasm ( qrng )
+
+avr_simulate ( laser )
+
+avr_upload ( laser
+  OPTIONS
+    PROGRAMMER      arduino
+    PROGRAMMER_PORT /dev/ttyACM0
+    PROGRAMMER_RATE 19200
+)

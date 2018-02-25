@@ -1,6 +1,6 @@
 
 #ifndef F_CPU
-#define F_CPU 16000000
+#define F_CPU 16000000UL
 #endif
 
 #include <mf_type.h>
@@ -18,7 +18,7 @@
 AVR_MCU ( F_CPU , "atmega328p" ) ;
 
 static const struct avr_mmcu_vcd_trace_t _mytrace [  ] _MMCU_ = {
-  { AVR_MCU_VCD_SYMBOL ( "PORTB" ) , . mask = _BV ( PORTB2 ) , . what = ( void * ) & PORTB } ,
+  { AVR_MCU_VCD_SYMBOL ( "PORTB" ) , . mask = 0xFF , . what = ( void * ) & PORTB } ,
 } ;
 
 static int

@@ -26,6 +26,10 @@ ISR ( TIMER1_OVF_vect )
   over ++ ;
 }
 
+ISR ( TIMER1_Comp_vect )
+{
+}
+
 static int
 uart_putchar ( char c , FILE * fd )
 {
