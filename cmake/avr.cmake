@@ -18,8 +18,9 @@ find_program ( AVR_OBJDUMP    avr-objdump     )
 find_program ( AVR_AVRDUDE    avrdude         )
 find_program ( AVR_SIMAVR     simavr          )
 
-set ( CMAKE_SYSTEM_NAME    Generic )
-set ( CMAKE_CROSSCOMPILING TRUE    )
+set ( CMAKE_SYSTEM_NAME      Generic )
+set ( CMAKE_SYSTEM_PROCESSOR avr     )
+set ( CMAKE_CROSSCOMPILING   TRUE    )
 
 set ( CMAKE_AR                  ${AVR_AR}         )
 set ( CMAKE_CXX_COMPILER_AR     ${AVR_GCC_AR}     )
@@ -36,8 +37,8 @@ set ( CMAKE_C_COMPILER          ${AVR_GCC}        )
 set ( CMAKE_CXX_COMPILER        ${AVR_GXX}        )
 
 set ( CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER )
-set ( CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY )
-set ( CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY )
+set ( CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY  )
+set ( CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY  )
 
 if ( NOT CMAKE_BUILD_TYPE )
   set ( CMAKE_BUILD_TYPE MinSizeRel CACHE STRING "Choose the type of build." FORCE )
@@ -110,17 +111,31 @@ function ( avr_upload AVR_TARGET )
   cmake_parse_arguments ( AVR "" "PROGRAMMER;PROGRAMMER_PORT;PROGRAMMER_RATE" "" ${AVR_OPTIONS} )
 
   add_custom_command ( OUTPUT ${AVR_TARGET}.hex
-    COMMAND ${AVR_OBJCOPY} -j .text -j .data -O ihex ${AVR_TARGET} ${AVR_TARGET}.hex
+    COMMAND ${AVR_OBJCOPY}
+      -j .text
+      -j .data
+      -O ihex ${AVR_TARGET} ${AVR_TARGET}.hex
     DEPENDS ${AVR_TARGET}
   )
 
   add_custom_command ( OUTPUT ${AVR_TARGET}.eep
-    COMMAND ${AVR_OBJCOPY} -j .eeprom --change-section-lma .eeprom=0 -O ihex ${AVR_TARGET} ${AVR_TARGET}.eep
+    COMMAND ${AVR_OBJCOPY}
+      -j .eeprom
+      --set-section=.eeprom=alloc,load
+      --change-section-lma .eeprom=0
+      --no-change-warnings
+      -O ihex ${AVR_TARGET} ${AVR_TARGET}.eep
     DEPENDS ${AVR_TARGET}
   )
 
   add_custom_target ( ${AVR_TARGET}_upload
-    COMMAND ${AVR_AVRDUDE} -p ${AVR_MCU} -c ${AVR_PROGRAMMER} -b ${AVR_PROGRAMMER_BAUD} -P ${AVR_PROGRAMMER_PORT} -U flash:w:${BINARY_HEX}
+    COMMAND ${AVR_AVRDUDE}
+      -p ${AVR_MCU}
+      -c ${AVR_PROGRAMMER}
+      -b ${AVR_PROGRAMMER_RATE}
+      -P ${AVR_PROGRAMMER_PORT}
+      -U flash:w:${AVR_TARGET}.hex
+      -U eeprom:w:${AVR_TARGET}.eep
     DEPENDS ${AVR_TARGET}.hex ${AVR_TARGET}.eep
   )
 endfunction ( avr_upload )

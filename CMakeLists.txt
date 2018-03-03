@@ -30,6 +30,7 @@ avr_disasm ( laser )
 avr_disasm ( qrng )
 
 avr_simulate ( laser )
+avr_simulate ( qrng  )
 
 avr_upload ( laser
   OPTIONS
