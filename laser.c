@@ -1,22 +1,28 @@
 
+#include <util/delay.h>
 #include <util/timer1.h>
 #include <util/interrupt.h>
 #include <util/debug.h>
 #include <util/pins.h>
+#include <util/rotary.h>
+
+#include <stdlib.h>
+#include <string.h>
 
 int
 main ( void )
 {
-  u08 pin [ 6 ] ;
-  u08 flag ;
+  unsigned char pin [ 6 ] ;
+  unsigned char flag ;
 
-  ddrb  ( 0b00000010 ) ;
-  portb ( 0b00000010 ) ;
+  _delay_ms ( 50 ) ;
 
   timer1_init (  ) ;
-  timer1_pwm (  ) ;
+  timer1_pwm_on (  ) ;
   timer1_freq ( 2000U ) ;
   timer1_duty (  500U ) ;
+
+  rotary_init (  ) ;
 
   disable_interrupts (  ) ;
 /*
@@ -37,9 +43,10 @@ main ( void )
     disable_interrupts (  ) ;
   }
 */
-  timer1_stop (  ) ;
-
   backtrace (  ) ;
+
+  timer1_pwm_off (  ) ;
+  timer1_stop (  ) ;
 
   sleep_mode (  ) ;
 
