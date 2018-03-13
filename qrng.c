@@ -21,35 +21,38 @@ ISR ( TIMER1_OVF_vect )
 
 ISR ( TIMER1_CAPT_vect )
 {
-  static unsigned char bit = 0 , hit = 0 ;
-  static unsigned long ts [ 8 ] ;
+  static unsigned char byte = 0 , bit = 0 , hit = 0 ;
+  static unsigned long prev ;
   static unsigned long dt [ 4 ] ;
-  union { unsigned long lohi ; struct { unsigned short lo , hi ; } ; } d ;
+  
+  union { unsigned long lohi ; struct { unsigned short lo , hi ; } ; } curr ;
 
-  d . lo = ICR1 ; // read TCNT1, which is copied to ICR1 on capture
-  d . hi = high ;
+  curr . lo = ICR1 ; // read TCNT1, which is copied to ICR1 on capture
+  curr . hi = high ;
 
-  ts [ ( hit ++ ) & 7 ] = d . lohi ;
-
-  switch ( hit << 1 ) // |--|__|--|__|
+  dt [ hit & 3 ] = curr - prev ;
+  
+  /*
+   *  |---|___|---|___|
+   *    0   1   2   3
+   * 
+   */
+  
+  switch ( ( hit ++ ) & 3 )
   {
-    case 0 :
-    case 1 :
-    case 2 :
-    case 3 :
+    case 0 : buff [ ( bit ++ ) & 7 ] = dt [ 0 ] > dt [ 2 ] ;
+    case 1 : buff [ ( bit ++ ) & 7 ] = dt [ 1 ] > dt [ 3 ] ;
+    case 2 : buff [ ( bit ++ ) & 7 ] = dt [ 2 ] > dt [ 0 ] ;
+    case 3 : buff [ ( bit ++ ) & 7 ] = dt [ 3 ] > dt [ 1 ] ;
   }
-  switch ( bit )
-  {
-    case  8 : bit = 0 ; head ++ ;
-    default : buff
-  }
+  
+  byte += ( bit & 8 ) >> 8 ;
+  prev = curr . lohi ;
 }
 
 int
 main ( void )
 {
-  unsigned char bit , temp ;
-
   disable_interrupts (  ) ;
 
   _delay_ms ( 50 ) ;
