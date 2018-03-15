@@ -21,32 +21,31 @@ ISR ( TIMER1_OVF_vect )
 
 ISR ( TIMER1_CAPT_vect )
 {
-  static unsigned char byte = 0 , bit = 0 , hit = 0 ;
+  static unsigned char bit = 0 , hit = 0 ;
   static unsigned long prev ;
   static unsigned long dt [ 4 ] ;
-  
+
   union { unsigned long lohi ; struct { unsigned short lo , hi ; } ; } curr ;
 
   curr . lo = ICR1 ; // read TCNT1, which is copied to ICR1 on capture
   curr . hi = high ;
 
-  dt [ hit & 3 ] = curr - prev ;
-  
+  dt [ hit & 3 ] = curr . lohi - prev ;
+
   /*
    *  |---|___|---|___|
    *    0   1   2   3
-   * 
    */
-  
+
   switch ( ( hit ++ ) & 3 )
   {
-    case 0 : buff [ ( bit ++ ) & 7 ] = dt [ 0 ] > dt [ 2 ] ;
-    case 1 : buff [ ( bit ++ ) & 7 ] = dt [ 1 ] > dt [ 3 ] ;
-    case 2 : buff [ ( bit ++ ) & 7 ] = dt [ 2 ] > dt [ 0 ] ;
-    case 3 : buff [ ( bit ++ ) & 7 ] = dt [ 3 ] > dt [ 1 ] ;
+    case 0 : buff [ head ] = ( dt [ 0 ] > dt [ 2 ] ) << ( ( bit ++ ) & 7 ) ; break ;
+    case 1 : buff [ head ] = ( dt [ 1 ] > dt [ 3 ] ) << ( ( bit ++ ) & 7 ) ; break ;
+    case 2 : buff [ head ] = ( dt [ 2 ] > dt [ 0 ] ) << ( ( bit ++ ) & 7 ) ; break ;
+    case 3 : buff [ head ] = ( dt [ 3 ] > dt [ 1 ] ) << ( ( bit ++ ) & 7 ) ; break ;
   }
-  
-  byte += ( bit & 8 ) >> 8 ;
+
+  head += ( bit & 8 ) >> 3 ;
   prev = curr . lohi ;
 }
 
@@ -64,13 +63,9 @@ main ( void )
 
   enable_interrupts (  ) ;
 
-  while ( 1 )
-  {
-    while ( tail == head ) ;
-    serial_send ( buff [ tail ++ ] ) ;
-  }
+  while ( 1 ) serial_loop ( buff , & head , & tail ) ;
 
-  backtrace (  ) ;
+  //backtrace (  ) ;
 
   timer1_disable_capture (  ) ;
   timer1_disable_overflow (  ) ;
