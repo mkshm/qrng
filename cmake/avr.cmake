@@ -106,18 +106,15 @@ function ( avr_target_link_libraries AVR_TARGET )
   target_link_libraries ( ${AVR_TARGET} PRIVATE ${ARGN} )
 endfunction ( avr_target_link_libraries )
 
-function ( avr_upload AVR_TARGET )
-  cmake_parse_arguments ( PARSE_ARGV 1 AVR "" "" "OPTIONS" )
-  cmake_parse_arguments ( AVR "" "PROGRAMMER;PROGRAMMER_PORT;PROGRAMMER_RATE" "" ${AVR_OPTIONS} )
-
+function ( avr_hexeep AVR_TARGET )
   add_custom_command ( OUTPUT ${AVR_TARGET}.hex
     COMMAND ${AVR_OBJCOPY}
       -j .text
       -j .data
-      -O ihex ${AVR_TARGET} ${AVR_TARGET}.hex
+      -O ihex ${AVR_TARGET} ${AVR_TAGRET}.hex
     DEPENDS ${AVR_TARGET}
   )
-
+  
   add_custom_command ( OUTPUT ${AVR_TARGET}.eep
     COMMAND ${AVR_OBJCOPY}
       -j .eeprom
@@ -127,6 +124,13 @@ function ( avr_upload AVR_TARGET )
       -O ihex ${AVR_TARGET} ${AVR_TARGET}.eep
     DEPENDS ${AVR_TARGET}
   )
+endfunction ( avr_hex )
+
+function ( avr_upload AVR_TARGET )
+  cmake_parse_arguments ( PARSE_ARGV 1 AVR "" "" "OPTIONS" )
+  cmake_parse_arguments ( AVR "" "PROGRAMMER;PROGRAMMER_PORT;PROGRAMMER_RATE" "" ${AVR_OPTIONS} )
+
+  avr_hexeep ( ${AVR_TARGET} )
 
   add_custom_target ( ${AVR_TARGET}_upload
     COMMAND ${AVR_AVRDUDE}
