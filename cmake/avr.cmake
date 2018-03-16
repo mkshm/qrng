@@ -114,7 +114,7 @@ function ( avr_hexeep AVR_TARGET )
       -O ihex ${AVR_TARGET} ${AVR_TAGRET}.hex
     DEPENDS ${AVR_TARGET}
   )
-  
+
   add_custom_command ( OUTPUT ${AVR_TARGET}.eep
     COMMAND ${AVR_OBJCOPY}
       -j .eeprom
@@ -124,7 +124,11 @@ function ( avr_hexeep AVR_TARGET )
       -O ihex ${AVR_TARGET} ${AVR_TARGET}.eep
     DEPENDS ${AVR_TARGET}
   )
-endfunction ( avr_hex )
+
+  add_custom_target ( ${AVR_TARGET}_hexeep ALL
+    DEPENDS ${AVR_TARGET}.hex ${AVR_TARGET}.eep
+  )
+endfunction ( avr_hexeep )
 
 function ( avr_upload AVR_TARGET )
   cmake_parse_arguments ( PARSE_ARGV 1 AVR "" "" "OPTIONS" )
