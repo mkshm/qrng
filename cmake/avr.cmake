@@ -45,7 +45,7 @@ if ( NOT CMAKE_BUILD_TYPE )
 endif ( NOT CMAKE_BUILD_TYPE )
 
 function ( avr_add_executable AVR_TARGET )
-  cmake_parse_arguments ( PARSE_ARGV 1 AVR "" "" "PROPERTIES" )
+  cmake_parse_arguments ( AVR "" "" "PROPERTIES" ${ARGN} )
   set ( AVR_SOURCES ${AVR_UNPARSED_ARGUMENTS} )
   cmake_parse_arguments ( AVR "" "MCU;MCU_FREQ" "" ${AVR_PROPERTIES} )
 
@@ -66,7 +66,7 @@ function ( avr_add_executable AVR_TARGET )
 endfunction ( avr_add_executable )
 
 function ( avr_add_library AVR_TARGET )
-  cmake_parse_arguments ( PARSE_ARGV 1 AVR "" "" "PROPERTIES" )
+  cmake_parse_arguments ( AVR "" "" "PROPERTIES" ${ARGN} )
   set ( AVR_SOURCES ${AVR_UNPARSED_ARGUMENTS} )
   cmake_parse_arguments ( AVR "" "MCU;MCU_FREQ" "" ${AVR_PROPERTIES} )
 
@@ -111,7 +111,7 @@ function ( avr_hexeep AVR_TARGET )
     COMMAND ${AVR_OBJCOPY}
       -j .text
       -j .data
-      -O ihex ${AVR_TARGET} ${AVR_TAGRET}.hex
+      -O ihex ${AVR_TARGET} ${AVR_TARGET}.hex
     DEPENDS ${AVR_TARGET}
   )
 
@@ -131,18 +131,27 @@ function ( avr_hexeep AVR_TARGET )
 endfunction ( avr_hexeep )
 
 function ( avr_upload AVR_TARGET )
-  cmake_parse_arguments ( PARSE_ARGV 1 AVR "" "" "OPTIONS" )
+  cmake_parse_arguments ( AVR "" "" "OPTIONS" ${ARGN} )
   cmake_parse_arguments ( AVR "" "PROGRAMMER;PROGRAMMER_PORT;PROGRAMMER_RATE" "" ${AVR_OPTIONS} )
 
   avr_hexeep ( ${AVR_TARGET} )
 
-  add_custom_target ( ${AVR_TARGET}_upload
+  add_custom_target ( ${AVR_TARGET}_upload_hex
     COMMAND ${AVR_AVRDUDE}
       -p ${AVR_MCU}
       -c ${AVR_PROGRAMMER}
       -b ${AVR_PROGRAMMER_RATE}
       -P ${AVR_PROGRAMMER_PORT}
       -U flash:w:${AVR_TARGET}.hex
+    DEPENDS ${AVR_TARGET}.hex ${AVR_TARGET}.eep
+  )
+
+  add_custom_target ( ${AVR_TARGET}_upload_eep
+    COMMAND ${AVR_AVRDUDE}
+      -p ${AVR_MCU}
+      -c ${AVR_PROGRAMMER}
+      -b ${AVR_PROGRAMMER_RATE}
+      -P ${AVR_PROGRAMMER_PORT}
       -U eeprom:w:${AVR_TARGET}.eep
     DEPENDS ${AVR_TARGET}.hex ${AVR_TARGET}.eep
   )

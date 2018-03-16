@@ -43,7 +43,7 @@ main ( void )
     disable_interrupts (  ) ;
   }
 */
-  backtrace (  ) ;
+  //backtrace (  ) ;
 
   timer1_pwm_off (  ) ;
   timer1_stop (  ) ;

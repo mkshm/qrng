@@ -5,7 +5,7 @@ endif (  )
 
 set ( CMAKE_LEGACY_CYGWIN_WIN32 OFF )
 
-cmake_minimum_required ( VERSION 3.10.0 FATAL_ERROR )
+cmake_minimum_required ( VERSION 3.6.0 FATAL_ERROR )
 
 set ( CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/cmake/avr.cmake" )
 set ( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake" )

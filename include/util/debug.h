@@ -3,7 +3,7 @@
 #define __DEBUG_H__
 
 #ifndef _NDEBUG
-
+/*
 #include <avr/io.h>
 #include <avr/sleep.h>
 #include <avr/interrupt.h>
@@ -56,7 +56,7 @@ backtrace ( void )
   fprintf ( & std , "Backtrace Complete\r\n" ) ;
 #undef BIN
 }
-
+*/
 #endif
 
 #endif

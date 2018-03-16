@@ -28,9 +28,9 @@ serial_stop ( void )
 }
 
 static inline void __attribute__ (( __always_inline__ ))
-serial_loop ( const volatile unsigned char * const restrict buff ,
-                    volatile unsigned char * const restrict head ,
-                    volatile unsigned char * const restrict tail )
+serial_loop ( const volatile unsigned char * const buff ,
+                    volatile unsigned char * const head ,
+                    volatile unsigned char * const tail )
 {
   while ( * tail != * head && UCSR0A & _BV ( UDRE0 ) ) UDR0 = buff [ ( * tail ) ++ ] ;
 }
