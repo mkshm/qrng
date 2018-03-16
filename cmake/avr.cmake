@@ -132,17 +132,19 @@ endfunction ( avr_hexeep )
 
 function ( avr_upload AVR_TARGET )
   cmake_parse_arguments ( AVR "" "" "OPTIONS" ${ARGN} )
-  cmake_parse_arguments ( AVR "" "PROGRAMMER;PROGRAMMER_PORT;PROGRAMMER_RATE" "" ${AVR_OPTIONS} )
+  cmake_parse_arguments ( AVR "" "MCU;PROGRAMMER;PROGRAMMER_PORT;PROGRAMMER_RATE" "" ${AVR_OPTIONS} )
+
+  message ( STATUS "${AVR_PROGRAMMER}" )
 
   avr_hexeep ( ${AVR_TARGET} )
 
   add_custom_target ( ${AVR_TARGET}_upload_hex
-    COMMAND ${AVR_AVRDUDE}
+    COMMAND ${AVR_AVRDUDE} -v
       -p ${AVR_MCU}
       -c ${AVR_PROGRAMMER}
       -b ${AVR_PROGRAMMER_RATE}
-      -P ${AVR_PROGRAMMER_PORT}
-      -U flash:w:${AVR_TARGET}.hex
+      -P ${AVR_PROGRAMMER_PORT} -D
+      -U flash:w:${AVR_TARGET}.hex:i
     DEPENDS ${AVR_TARGET}.hex ${AVR_TARGET}.eep
   )
 

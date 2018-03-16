@@ -29,15 +29,13 @@ avr_target_include_directories ( laser ${CMAKE_SOURCE_DIR}/include )
 avr_disasm ( laser )
 avr_disasm ( qrng )
 
-avr_hexeep ( laser )
-avr_hexeep ( qrng )
-
 #avr_simulate ( laser )
 #avr_simulate ( qrng  )
 
-#avr_upload ( laser
-#  OPTIONS
-#    PROGRAMMER      arduino
-#    PROGRAMMER_PORT /dev/ttyACM0
-#    PROGRAMMER_RATE 19200
-#)
+avr_upload ( qrng
+  OPTIONS
+    MCU             atmega328p
+    PROGRAMMER      arduino
+    PROGRAMMER_PORT /dev/ttyACM0
+    PROGRAMMER_RATE 115200
+)
