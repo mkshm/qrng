@@ -34,7 +34,6 @@ avr_disasm ( qrng )
 
 avr_upload ( qrng
   OPTIONS
-    MCU             atmega328p
     PROGRAMMER      arduino
     PROGRAMMER_PORT /dev/ttyACM0
     PROGRAMMER_RATE 115200
