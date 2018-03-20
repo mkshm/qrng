@@ -1,5 +1,5 @@
 build/*
-utlities/build/*
+utilities/build/*
 *.o
 *.i
 *.s
