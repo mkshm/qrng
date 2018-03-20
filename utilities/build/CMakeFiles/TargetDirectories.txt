@@ -1,3 +1,0 @@
-/home/pi/projects/qrng/utilities/build/CMakeFiles/edit_cache.dir
-/home/pi/projects/qrng/utilities/build/CMakeFiles/rebuild_cache.dir
-/home/pi/projects/qrng/utilities/build/CMakeFiles/parse.dir
