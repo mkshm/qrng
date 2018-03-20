@@ -37,9 +37,9 @@ tm ( void )
 }
 
 /*
-   *  |---|___|---|___| Visual of the below switch statement.
-   *    0   1   2   3
-   */
+ *  |---|___|---|___| Visual of what is happening below.
+ *    0   1   2   3
+ */
 
 static void step10 ( void ) { timer1_step = step3  ; time [ 2 ] = tm ( ) ; delt [ 1 ] = time [ 2 ] - time [ 1 ] ; buff [ head ++ ] |= ( delt [ 1 ] > delt [ 3 ] ) << 7 ; }
 static void step9  ( void ) { timer1_step = step10 ; time [ 1 ] = tm ( ) ; delt [ 0 ] = time [ 1 ] - time [ 0 ] ; buff [ head    ] |= ( delt [ 0 ] > delt [ 2 ] ) << 6 ; }
@@ -78,7 +78,7 @@ main ( void )
   
   enable_interrupts (  ) ; //enable interrupts, and begin sending data to serial port.
 
-  while ( 1 ) serial_loop ( buff , & head , & tail ) ;
+  serial_loop ( buff , & head , & tail ) ;
 
   // We shouldn't ever get here.
   // I'm extremely pedantic, whatever you initialize you de-initialize.
