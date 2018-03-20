@@ -12,46 +12,47 @@
 
 #define HOT_INLINE inline __attribute__ (( __always_inline__ , __hot__ ))
 
-typedef void ( * pfn  ) ( void ) ;
-typedef void ( * step ) ( pfn  ) ;
 typedef uint32_t u32 ;
 typedef uint16_t u16 ;
 typedef uint8_t  u08 ;
 
+static void step3 ( void ) ;
+static void step0 ( void ) ;
+
 static volatile u32 time [ 4 ] ;
+static volatile u32 delt [ 4 ] ;
 static volatile u16 high ;
 
 static volatile u08 buff [ 256 ] ;
 static volatile u08 head , tail ;
 
-static volatile step timer1_step ;
+static void ( *volatile timer1_step ) ( void ) = step0 ;
 
 static HOT_INLINE u32
 tm ( void )
 {
-  return (union{struct{u16 lo,hi;};u32 lohi;})({.lo=ICR1,.hi=high}) . lohi ;
+  struct lohi { u16 lo,hi; } temp = {.lo=ICR1,.hi=high} ;
+  typedef union { struct lohi d ; u32 lohi ; } cast ;
+  return ((cast)temp) . lohi ;
 }
-
-static HOT_INLINE u32 dt ( const u32 t2 , const u32 t1 ) { return t2 - t1 ; }
 
 /*
    *  |---|___|---|___| Visual of the below switch statement.
    *    0   1   2   3
    */
 
-static void step2 ( void ) ;
-   
-static void step9 ( void ) { timer1_step = step2 ; time [ 1 ] = tm ( ) ; dt [ 0 ] = dt ( time [ 1 ] , time [ 0 ] ) ; buff [ head ++ ] |= ( dt [ 3 ] > dt [ 1 ] ) << 7 ; }
-static void step8 ( void ) { timer1_step = step9 ; time [ 0 ] = tm ( ) ; dt [ 3 ] = dt ( time [ 0 ] , time [ 3 ] ) ; buff [ head    ] |= ( dt [ 2 ] > dt [ 0 ] ) << 6 ; }
-static void step7 ( void ) { timer1_step = step8 ; time [ 3 ] = tm ( ) ; dt [ 2 ] = dt ( time [ 3 ] , time [ 2 ] ) ; buff [ head    ] |= ( dt [ 3 ] > dt [ 1 ] ) << 5 ; }
-static void step6 ( void ) { timer1_step = step7 ; time [ 2 ] = tm ( ) ; dt [ 1 ] = dt ( time [ 2 ] , time [ 1 ] ) ; buff [ head    ] |= ( dt [ 2 ] > dt [ 0 ] ) << 4 ; }
-static void step5 ( void ) { timer1_step = step6 ; time [ 1 ] = tm ( ) ; dt [ 0 ] = dt ( time [ 1 ] , time [ 0 ] ) ; buff [ head    ] |= ( dt [ 3 ] > dt [ 1 ] ) << 3 ; }
-static void step4 ( void ) { timer1_step = step5 ; time [ 0 ] = tm ( ) ; dt [ 3 ] = dt ( time [ 0 ] , time [ 3 ] ) ; buff [ head    ] |= ( dt [ 2 ] > dt [ 0 ] ) << 2 ; }
-static void step3 ( void ) { timer1_step = step4 ; time [ 3 ] = tm ( ) ; dt [ 2 ] = dt ( time [ 3 ] , time [ 2 ] ) ; buff [ head    ] |= ( dt [ 3 ] > dt [ 1 ] ) << 1 ; }
-static void step2 ( void ) { timer1_step = step3 ; time [ 2 ] = tm ( ) ; dt [ 1 ] = dt ( time [ 2 ] , time [ 1 ] ) ; buff [ head    ]  = ( dt [ 2 ] > dt [ 0 ] ) << 0 ; }
+static void step10 ( void ) { timer1_step = step3  ; time [ 2 ] = tm ( ) ; delt [ 1 ] = time [ 2 ] - time [ 1 ] ; buff [ head ++ ] |= ( delt [ 1 ] > delt [ 3 ] ) << 7 ; }
+static void step9  ( void ) { timer1_step = step10 ; time [ 1 ] = tm ( ) ; delt [ 0 ] = time [ 1 ] - time [ 0 ] ; buff [ head    ] |= ( delt [ 0 ] > delt [ 2 ] ) << 6 ; }
+static void step8  ( void ) { timer1_step = step9  ; time [ 0 ] = tm ( ) ; delt [ 3 ] = time [ 0 ] - time [ 3 ] ; buff [ head    ] |= ( delt [ 3 ] > delt [ 1 ] ) << 5 ; }
+static void step7  ( void ) { timer1_step = step8  ; time [ 3 ] = tm ( ) ; delt [ 2 ] = time [ 3 ] - time [ 2 ] ; buff [ head    ] |= ( delt [ 2 ] > delt [ 0 ] ) << 4 ; }
+static void step6  ( void ) { timer1_step = step7  ; time [ 2 ] = tm ( ) ; delt [ 1 ] = time [ 2 ] - time [ 1 ] ; buff [ head    ] |= ( delt [ 1 ] > delt [ 3 ] ) << 3 ; }
+static void step5  ( void ) { timer1_step = step6  ; time [ 1 ] = tm ( ) ; delt [ 0 ] = time [ 1 ] - time [ 0 ] ; buff [ head    ] |= ( delt [ 0 ] > delt [ 2 ] ) << 2 ; }
+static void step4  ( void ) { timer1_step = step5  ; time [ 0 ] = tm ( ) ; delt [ 3 ] = time [ 0 ] - time [ 3 ] ; buff [ head    ] |= ( delt [ 3 ] > delt [ 1 ] ) << 1 ; }
+static void step3  ( void ) { timer1_step = step4  ; time [ 3 ] = tm ( ) ; delt [ 2 ] = time [ 3 ] - time [ 2 ] ; buff [ head    ]  = ( delt [ 2 ] > delt [ 0 ] ) << 0 ; }
 
-static void step1 ( void ) { timer1_step = step2 ; time [ 1 ] = tm ( ) ; dt [ 0 ] = dt ( time [ 1 ] , time [ 0 ] ) ; }
-static void step0 ( void ) { timer1_step = step1 ; time [ 0 ] = tm ( ) ; }
+static void step2  ( void ) { timer1_step = step3  ; time [ 2 ] = tm ( ) ; delt [ 1 ] = time [ 2 ] - time [ 1 ] ; }
+static void step1  ( void ) { timer1_step = step2  ; time [ 1 ] = tm ( ) ; delt [ 0 ] = time [ 1 ] - time [ 0 ] ; }
+static void step0  ( void ) { timer1_step = step1  ; time [ 0 ] = tm ( ) ; }
 
 ISR ( TIMER1_OVF_vect )
 {
@@ -74,7 +75,6 @@ main ( void )
   timer1_init (  ) ;
   timer1_enable_overflow (  ) ;
   timer1_enable_capture (  ) ;
-  timer1_step = step0 ;
   
   enable_interrupts (  ) ; //enable interrupts, and begin sending data to serial port.
 
