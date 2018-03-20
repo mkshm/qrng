@@ -6,13 +6,52 @@
 #include <util/pins.h>
 #include <util/serial.h>
 
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
-static volatile unsigned short high ;
+#define HOT_INLINE inline __attribute__ (( __always_inline__ , __hot__ ))
 
-static volatile unsigned char buff [ 256 ] ;
-static volatile unsigned char head , tail ;
+typedef void ( * pfn  ) ( void ) ;
+typedef void ( * step ) ( pfn  ) ;
+typedef uint32_t u32 ;
+typedef uint16_t u16 ;
+typedef uint8_t  u08 ;
+
+static volatile u32 time [ 4 ] ;
+static volatile u16 high ;
+
+static volatile u08 buff [ 256 ] ;
+static volatile u08 head , tail ;
+
+static volatile step timer1_step ;
+
+static HOT_INLINE u32
+tm ( void )
+{
+  return (union{struct{u16 lo,hi;};u32 lohi;})({.lo=ICR1,.hi=high}) . lohi ;
+}
+
+static HOT_INLINE u32 dt ( const u32 t2 , const u32 t1 ) { return t2 - t1 ; }
+
+/*
+   *  |---|___|---|___| Visual of the below switch statement.
+   *    0   1   2   3
+   */
+
+static void step2 ( void ) ;
+   
+static void step9 ( void ) { timer1_step = step2 ; time [ 1 ] = tm ( ) ; dt [ 0 ] = dt ( time [ 1 ] , time [ 0 ] ) ; buff [ head ++ ] |= ( dt [ 3 ] > dt [ 1 ] ) << 7 ; }
+static void step8 ( void ) { timer1_step = step9 ; time [ 0 ] = tm ( ) ; dt [ 3 ] = dt ( time [ 0 ] , time [ 3 ] ) ; buff [ head    ] |= ( dt [ 2 ] > dt [ 0 ] ) << 6 ; }
+static void step7 ( void ) { timer1_step = step8 ; time [ 3 ] = tm ( ) ; dt [ 2 ] = dt ( time [ 3 ] , time [ 2 ] ) ; buff [ head    ] |= ( dt [ 3 ] > dt [ 1 ] ) << 5 ; }
+static void step6 ( void ) { timer1_step = step7 ; time [ 2 ] = tm ( ) ; dt [ 1 ] = dt ( time [ 2 ] , time [ 1 ] ) ; buff [ head    ] |= ( dt [ 2 ] > dt [ 0 ] ) << 4 ; }
+static void step5 ( void ) { timer1_step = step6 ; time [ 1 ] = tm ( ) ; dt [ 0 ] = dt ( time [ 1 ] , time [ 0 ] ) ; buff [ head    ] |= ( dt [ 3 ] > dt [ 1 ] ) << 3 ; }
+static void step4 ( void ) { timer1_step = step5 ; time [ 0 ] = tm ( ) ; dt [ 3 ] = dt ( time [ 0 ] , time [ 3 ] ) ; buff [ head    ] |= ( dt [ 2 ] > dt [ 0 ] ) << 2 ; }
+static void step3 ( void ) { timer1_step = step4 ; time [ 3 ] = tm ( ) ; dt [ 2 ] = dt ( time [ 3 ] , time [ 2 ] ) ; buff [ head    ] |= ( dt [ 3 ] > dt [ 1 ] ) << 1 ; }
+static void step2 ( void ) { timer1_step = step3 ; time [ 2 ] = tm ( ) ; dt [ 1 ] = dt ( time [ 2 ] , time [ 1 ] ) ; buff [ head    ]  = ( dt [ 2 ] > dt [ 0 ] ) << 0 ; }
+
+static void step1 ( void ) { timer1_step = step2 ; time [ 1 ] = tm ( ) ; dt [ 0 ] = dt ( time [ 1 ] , time [ 0 ] ) ; }
+static void step0 ( void ) { timer1_step = step1 ; time [ 0 ] = tm ( ) ; }
 
 ISR ( TIMER1_OVF_vect )
 {
@@ -21,33 +60,7 @@ ISR ( TIMER1_OVF_vect )
 
 ISR ( TIMER1_CAPT_vect )
 {
-  static unsigned char bit = 0 , hit = 0 ; // Create variables
-  static unsigned long prev ;
-  static unsigned long dt [ 4 ] ;
-
-  union { unsigned long lohi ; struct { unsigned short lo , hi ; } ; } curr ; // This is a portable way to use 2 16-bit
-                                                                              // integers to create a 32 bit integer.
-
-  curr . lo = ICR1 ; // read TCNT1, which is copied to ICR1 on capture
-  curr . hi = high ;
-
-  dt [ hit & 3 ] = curr . lohi - prev ; // create the delta
-
-  /*
-   *  |---|___|---|___| Visual of the below switch statement.
-   *    0   1   2   3
-   */
-
-  switch ( ( hit ++ ) & 3 )
-  {
-    case 0 : buff [ head ] = ( dt [ 0 ] > dt [ 2 ] ) << ( ( bit ++ ) & 7 ) ; break ; // The only confusing part here
-    case 1 : buff [ head ] = ( dt [ 1 ] > dt [ 3 ] ) << ( ( bit ++ ) & 7 ) ; break ; // is the order in which deltas
-    case 2 : buff [ head ] = ( dt [ 2 ] > dt [ 0 ] ) << ( ( bit ++ ) & 7 ) ; break ; // are compared, and the bitwise
-    case 3 : buff [ head ] = ( dt [ 3 ] > dt [ 1 ] ) << ( ( bit ++ ) & 7 ) ; break ; // logic
-  }
-
-  head += ( bit & 8 ) >> 2 ; // increment head every byte written.
-  prev = curr . lohi ;
+  timer1_step (  ) ;
 }
 
 int
@@ -61,7 +74,8 @@ main ( void )
   timer1_init (  ) ;
   timer1_enable_overflow (  ) ;
   timer1_enable_capture (  ) ;
-
+  timer1_step = step0 ;
+  
   enable_interrupts (  ) ; //enable interrupts, and begin sending data to serial port.
 
   while ( 1 ) serial_loop ( buff , & head , & tail ) ;
