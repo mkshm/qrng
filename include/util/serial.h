@@ -9,6 +9,18 @@
 #include <avr/sfr_defs.h>
 #include <avr/eeprom.h>
 
+#include <stdio.h>
+
+static int
+uart_putchar ( char c , FILE * fd )
+{
+  loop_until_bit_is_set ( UCSR0A , UDRE0 ) ;
+  UDR0 = c ;
+  return 0 ;
+}
+
+static FILE std = FDEV_SETUP_STREAM ( uart_putchar , NULL , _FDEV_SETUP_WRITE ) ;
+
 static inline void __attribute__ (( __always_inline__ ))
 serial_init ( void )
 {
@@ -32,9 +44,11 @@ serial_loop ( const volatile unsigned char * const buff ,
                     volatile unsigned char * const head ,
                     volatile unsigned char * const tail )
 {
+  
   while ( 1 )
   {
-    if ( * tail != * head && UCSR0A & _BV ( UDRE0 ) ) UDR0 = buff [ ( * tail ) ++ ] ;
+    if ( * tail != * head && UCSR0A & _BV ( UDRE0 ) ) fprintf ( & std , "%hhu\n" , buff [ ( * tail ) ++ ] ) ;
+// UDR0 = buff [ ( * tail ) ++ ] ;
   }
 }
 

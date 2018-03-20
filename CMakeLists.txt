@@ -35,6 +35,6 @@ avr_disasm ( qrng )
 avr_upload ( qrng
   OPTIONS
     PROGRAMMER      arduino
-    PROGRAMMER_PORT /dev/ttyACM1
+    PROGRAMMER_PORT /dev/ttyACM0
     PROGRAMMER_RATE 115200
 )
