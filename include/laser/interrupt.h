@@ -5,13 +5,15 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-static inline void __attribute__ (( __always_inline__ ))
+#define STATIC_INLINE static inline void __attribute__ (( __always_inline__ , __hot__ ))
+
+STATIC_INLINE
 enable_interrupts ( void )
 {
   sei (  ) ;
 }
 
-static inline void __attribute__ (( __always_inline__ ))
+STATIC_INLINE
 disable_interrupts ( void )
 {
   cli (  ) ;
@@ -41,4 +43,6 @@ disable_int1 ( void )
   GICR |= ( 1 << INT1 ) ;
 }
 */
+
+#undef STATIC_INLINE
 #endif

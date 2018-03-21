@@ -9,7 +9,7 @@
 #include <avr/sfr_defs.h>
 #include <avr/eeprom.h>
 
-#include <util/fence.h>
+#include <laser/fence.h>
 
 static inline void __attribute__ (( __always_inline__ ))
 ddrb ( const unsigned char byte )
