@@ -10,8 +10,12 @@
 
 static speed_t tcconvspeed ( int ) ;
 
-static speed_t serial_baud = B0 ;
-static int serial_tty = -1 ;
+static tcflag_t serial_cflag =  0 ; /* serial control flags */
+static tcflag_t serial_oflag =  0 ; /* serial output flags */
+static tcflag_t serial_iflag =  0 ; /* serial input flags */
+static tcflag_t serial_lflag =  0 ; /* serial local flags */
+static speed_t  serial_baud  = B0 ;
+static int      serial_port  = -1 ;
 
 static error_t argp_callback ( int , char * , struct argp_state * ) ;
 
@@ -24,7 +28,8 @@ static const struct argp_option argp_option [  ] = {
   { "quiet"   , 'q' , NULL     , 0 , "Don't produce any output" } ,
   { "baud"    , 'b' , "NUMBER" , 0 , "TTY baud rate"  } ,
   { "stops"   , 's' , "NUMBER" , 0 , "Number of stop bits"  } ,
-  { "parity"  , 'p' , NULL     , 0 , "Enable TTY parity"  } ,
+  { "even-parity" , 'p' , NULL , 0 , "Enable Even parity"  } ,
+  { "odd-parity"  , 'P' , NULL , 0 , "Enable Odd parity"  } ,
   { 0 } ,
 } ;
 
@@ -44,13 +49,23 @@ argp_callback ( int key , char * arg , struct argp_state * argp )
   {
     case 'b' :
       serial_baud = tcconvspeed ( atoi ( arg ) ) ;
-
-      fprintf ( stdout , "%u\n" , serial_baud ) ;
+    break ;
+    case 's' :
+      if ( 2 <= atoi ( arg ) ) serial_cflag |= CSTOPB ;
+    break ;
+    case 'p' :
+      serial_cflag |= PARENB ;
+      serial_iflag |= INPCK ;
+    break ;
+    case 'P' :
+      serial_cflag |= PARENB ;
+      serial_cflag |= PARODD ;
+      serial_iflag |= INPCK ;
     break ;
     case ARGP_KEY_ARG :
       ret = ARGP_ERR_UNKNOWN ;
 
-      if ( serial_tty = open ( arg , O_RDONLY | O_NOCTTY | O_SYNC ) ) perror ( "open" ) ;
+      if ( -1 == ( serial_port = open ( arg , O_RDONLY | O_NOCTTY | O_SYNC ) ) ) perror ( "open" ) ;
 
       ret = 0 ;
     break ;
@@ -66,37 +81,38 @@ init ( void )
 
   memset ( & tty , 0 , sizeof tty ) ;
 
-  if ( 0 != tcgetattr ( serial_tty , & tty ) ) perror ( "tcgetattr" ) ;
+  if ( 0 != tcgetattr ( serial_port , & tty ) ) perror ( "tcgetattr" ) ;
 
-  tty . c_cflag &= ~ ( CSIZE | CRTSCTS | CSTOPB | PARODD ) ;
-  tty . c_iflag &= ~ ( IGNBRK | IXON | IXOFF | IXANY ) ;
-  tty . c_lflag &= ~ ( ISIG | NOFLSH ) ;
-  tty . c_cflag |= CBAUD | CS8 | CLOCAL | CREAD | PARENB ;
-  tty . c_lflag  = 0 ;
-  tty . c_oflag  = 0 ;
-  tty . c_cc [ VMIN  ] = 0 ;
-  tty . c_cc [ VTIME ] = 5 ;
+  cfmakeraw ( & tty ) ;
 
-  cfsetispeed ( & tty , serial_baud ) ;
+  tty . c_cflag |= serial_cflag | CBAUD | CLOCAL | CREAD ;
+  tty . c_lflag |= serial_lflag ;
+  tty . c_oflag |= serial_oflag ;
+  tty . c_iflag |= serial_iflag ;
 
-  if ( 0 != tcsetattr ( serial_tty , TCSANOW , & tty ) ) perror ( "tcsetattr" ) ;
+  tty . c_cc [ VMIN  ] = 16 ;
+  tty . c_cc [ VTIME ] = 1 ;
+
+  if ( cfsetispeed ( & tty , serial_baud ) ) perror ( "cfsetispeed" ) ;
+
+  if ( 0 != tcsetattr ( serial_port , TCSANOW , & tty ) ) perror ( "tcsetattr" ) ;
+
+  fputs ( "We got here\n" , stdout ) ;
 }
 
 static void
 fini ( void )
 {
-  if ( -1 != serial_tty ) close ( serial_tty ) ;
+  if ( -1 != serial_port ) close ( serial_port ) ;
 }
 
 static void
 spin ( void )
 {
-  unsigned char buff [ 256 ] ;
-  unsigned char head ;
-  unsigned char tail ;
+  unsigned char buff = 0 ;
   while ( 1 )
   {
-    if ( 0 < read ( serial_tty , buff , 8 ) ) fprintf ( stdout , "%hhu\n" , buff [ 0 ] ) ;
+    if ( 1 == read ( serial_port , & buff , 1 ) ) fprintf ( stdout , "%hhu\n" , buff ) ;
   }
 }
 
@@ -105,10 +121,10 @@ main ( int argc , char ** argv )
 {
   error_t ret = 0 ;
 
-  if ( ( ret = argp_parse ( & argp , argc , argv , 0 , NULL , NULL ) ) )
+  if ( 0 == ( ret = argp_parse ( & argp , argc , argv , 0 , NULL , NULL ) ) )
   {
-    //init (  ) ;
-    //spin (  ) ;
+    init (  ) ;
+    spin (  ) ;
     fini (  ) ;
   }
 

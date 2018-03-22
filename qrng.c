@@ -89,9 +89,13 @@ main ( void )
   timer1_enable_overflow (  ) ;
   timer1_enable_capture (  ) ;
 
-  enable_interrupts (  ) ; //enable interrupts, and begin sending data to serial port.
+  enable_interrupts (  ) ; // Enable interrupts, and begin sending data to serial port.
 
-  serial_loop ( buff , & head , & tail ) ;
+  while ( 1 )
+  {
+    serial_wait ( /* head , tail */ ) ;
+    serial_send ( buff [ tail ] ) ;
+  }
 
   return 0 ;
 }
