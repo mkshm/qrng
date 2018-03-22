@@ -10,3 +10,4 @@ cmake_minimum_required ( VERSION 3.6.0 FATAL_ERROR )
 project ( AVR_PROJECT VERSION 0.0.1.0 LANGUAGES C CXX )
 
 add_executable ( parse parse.c )
+add_executable ( serial_listen serial_listen.c )

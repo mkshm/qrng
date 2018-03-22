@@ -9,11 +9,11 @@
 
 STATIC_INLINE
 serial_init ( void )
-{                                              // mult = 16 for 1x, 8 for 2x ; f_osc = clock frequency
-  UBRR0   = 0u ;                               // Select baud using: baud = f_osc / ( mult * ( UBBR0 + 1 ) )
-  UCSR0A |= _BV ( U2X0 ) ;                     // 2x Speed Enable ( changes multiplier above )
-  UCSR0C |= _BV ( UCSZ00 ) | _BV ( UCSZ01 ) ;  // 8 bit Output Frame
-  UCSR0B |= _BV ( TXEN0 ) ;                    // Enable Transmitted Mode
+{                                                              // mult = 16 for 1x, 8 for 2x ; f_osc = clock frequency
+  UBRR0   = 0u ;                                               // Select baud using: baud = f_osc / ( mult * ( UBBR0 + 1 ) )
+  UCSR0A |= _BV ( U2X0 ) ;                                     // 2x Speed Enable ( changes multiplier above )
+  UCSR0C |= _BV ( UCSZ00 ) | _BV ( UCSZ01 ) | _BV ( UPM01 ) ;  // 8 bit + 1 stop bit + even parity Output Frame
+  UCSR0B |= _BV ( TXEN0 ) ;                                    // Enable Transmitted Mode
 }
 
 STATIC_INLINE
