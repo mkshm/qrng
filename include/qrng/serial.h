@@ -15,6 +15,7 @@ serial_init ( void )
   UCSR0C |= _BV ( UCSZ00 ) | _BV ( UCSZ01 ) ;  // 8 bit
   UCSR0C |= _BV ( UPM01  ) | _BV ( USBS0  ) ;  // 1 stop bit + even parity
   UCSR0B |= _BV ( TXEN0 ) ;                    // Enable Transmitted Mode
+  DDRD   |= _BV ( DDD1 ) ;
 }
 
 STATIC_INLINE

@@ -87,14 +87,15 @@ main ( void )
   serial_init (  ) ;            // Setup required facilities.
   timer1_init (  ) ;
   timer1_enable_overflow (  ) ;
-  timer1_enable_capture (  ) ;
+  timer1_enable_capture  (  ) ;
 
   enable_interrupts (  ) ; // Enable interrupts, and begin sending data to serial port.
 
   while ( 1 )
   {
     serial_wait ( /* head , tail */ ) ;
-    serial_send ( buff [ tail ] ) ;
+    while ( head == tail ) ;
+    serial_send ( buff [ tail ++ ] ) ;
   }
 
   return 0 ;
