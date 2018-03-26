@@ -43,10 +43,21 @@ static volatile u32 delt [ 4 ] ;
 static void ( * volatile timer1_step ) ( void ) = step0 ;
 
 #define stp ( n ) timer1_step = step ## n
-#define upc( tm )      time [ tm ] = curr . time
-#define upd( tm , dt ) time [ tm ] = curr . time ; delt [ dt ] = time [ tm ] - time [ dt ]
 
-#define bts( new , old ) bit = ( delt [ new ] > delt [ old ] )
+#define upc( tm ) ({ time [ tm ] = curr . time ; })
+
+#define upd( tm ) \
+  ({ \
+    time [ tm ] = curr . time ; \
+    delt [ 3 & ( tm - 1 ) ] = time [ tm ] - time [ 3 & ( tm - 1 ) ] ; \
+  })
+
+#define bts( tm ) \
+  ({ \
+    time [ tm ] = curr . time ; \
+    delt [ 3 & ( tm - 1 ) ] = time [ tm ] - time [ 3 & ( tm - 1 ) ] ; \
+    bit = ( delt [ 3 & ( tm - 1 ) ] > delt [ 3 & ( tm - 3 ) ] ) ; \
+  })
 /*
   - The first function, stp updates timer1_step to the next step.
   - The second function, upd, gets a new time, stores it the associated
@@ -54,17 +65,16 @@ static void ( * volatile timer1_step ) ( void ) = step0 ;
       delta to compute.
   - The Third function(s) compute and assign
 */
-static void step10 ( void ) { stp ( 3  ) ; upd ( 2 , 1 ) ; bts ( 1 , 3 ) ; }
-static void step9  ( void ) { stp ( 10 ) ; upd ( 1 , 0 ) ; bts ( 0 , 2 ) ; }
-static void step8  ( void ) { stp ( 9  ) ; upd ( 0 , 3 ) ; bts ( 3 , 1 ) ; }
-static void step7  ( void ) { stp ( 8  ) ; upd ( 3 , 2 ) ; bts ( 2 , 0 ) ; }
-static void step6  ( void ) { stp ( 7  ) ; upd ( 2 , 1 ) ; bts ( 1 , 3 ) ; }
-static void step5  ( void ) { stp ( 6  ) ; upd ( 1 , 0 ) ; bts ( 0 , 2 ) ; }
-static void step4  ( void ) { stp ( 5  ) ; upd ( 0 , 3 ) ; bts ( 3 , 1 ) ; }
-static void step3  ( void ) { stp ( 4  ) ; upd ( 3 , 2 ) ; bts ( 2 , 0 ) ; }
-
-static void step2  ( void ) { stp ( 3  ) ; upd ( 2 , 1 ) ; }
-static void step1  ( void ) { stp ( 2  ) ; upd ( 1 , 0 ) ; }
+static void step10 ( void ) { stp ( 3  ) ; bts ( 2 ) ; }
+static void step9  ( void ) { stp ( 10 ) ; bts ( 1 ) ; }
+static void step8  ( void ) { stp ( 9  ) ; bts ( 0 ) ; }
+static void step7  ( void ) { stp ( 8  ) ; bts ( 3 ) ; }
+static void step6  ( void ) { stp ( 7  ) ; bts ( 2 ) ; }
+static void step5  ( void ) { stp ( 6  ) ; bts ( 1 ) ; }
+static void step4  ( void ) { stp ( 5  ) ; bts ( 0 ) ; }
+static void step3  ( void ) { stp ( 4  ) ; bts ( 3 ) ; }
+static void step2  ( void ) { stp ( 3  ) ; upd ( 2 ) ; }
+static void step1  ( void ) { stp ( 2  ) ; upd ( 1 ) ; }
 static void step0  ( void ) { stp ( 1  ) ; upc ( 0 ) ; }
 
 ISR ( TIMER1_OVF_vect  ) // The actual Timer1 Overflow Interrupt Service Routine
@@ -106,7 +116,7 @@ main ( void )
     
     while ( ! ( 8 & bpos ) )
     {
-      bpos = lock_acquire ( & next , & serv ) ;  /* lock_acquire conveniently returns bit-potisition */
+      bpos = lock_acquire ( & next , & serv ) ;  /* lock_acquire conveniently returns bit-position */
       byte |= bit << ( 7 & bpos ) ;              /* set the bit in the byte */
     }
     
