@@ -88,24 +88,31 @@ main ( void )
 
   _delay_ms ( 50 ) ; /* Wait for the processors voltage to rise.  */
 
-  serial_init (  ) ;            /* Setup required facilities.  */
+  /* Setup required facilities.  */
+  
+  serial_init (  ) ;
   timer1_init (  ) ;
   timer1_enable_overflow (  ) ;
   timer1_enable_capture  (  ) ;
 
   enable_interrupts (  ) ;
 
+  /* BEGIN */
+  
   while ( 1 )
   {
+    byte = 0 ; /* Both byte and bpos have to be erased */
+    bpos = 0 ; /* each time we go through the loop     */
+    
     while ( ! ( 8 & bpos ) )
     {
-      bpos = lock_acquire ( & next , & serv ) ;
-      byte |= bit << ( 7 & bpos ) ;
+      bpos = lock_acquire ( & next , & serv ) ;  /* lock_acquire conveniently returns bit-potisition */
+      byte |= bit << ( 7 & bpos ) ;              /* set the bit in the byte */
     }
     
-    if ( serial_try_grab (  ) )  /* try and grab an empty buffer      */
-      serial_send ( byte ) ;     /* send data using the empty buffer  */
-                                 /* if this fails just move on to the next byte  */
+    if ( serial_empty (  ) )  /* try and grab an empty buffer      */
+      serial_send ( byte ) ;  /* send data using the empty buffer  */
+                              /* if this fails just move on to the next byte  */
   }
 
   return 0 ;
