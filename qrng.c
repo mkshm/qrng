@@ -1,5 +1,4 @@
 
-#include <util/atomic.h>
 #include <util/delay.h>
 
 #include <qrng/timer1.h>
@@ -43,6 +42,7 @@ static volatile u32 delt [ 4 ] ;
 
 static void ( * volatile timer1_step ) ( void ) = step0 ;
 
+#define stp ( n ) timer1_step = step ## n
 #define upc( tm )      time [ tm ] = curr . time
 #define upd( tm , dt ) time [ tm ] = curr . time ; delt [ dt ] = time [ tm ] - time [ dt ]
 
@@ -75,7 +75,7 @@ ISR ( TIMER1_OVF_vect  ) // The actual Timer1 Overflow Interrupt Service Routine
 ISR ( TIMER1_CAPT_vect ) // The actual Timer1 Input Capture Event Interrupt Service Routine
 {
   curr . lo = ICR1 ; /* ICR1 is a special register which gets set to Timer1's counter TCNT1 upon entry */
-  timer1_step  (  ) 
+  timer1_step  (  ) ;
   lock_release ( & serv ) ;
 } 
 
