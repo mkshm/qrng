@@ -21,13 +21,13 @@ serial_init ( void )
 }
 
 STATIC_INLINE void
-serial_grab ( void )
+serial_wait ( void )
 {
   while ( ! ( UCSR0A & _BV ( UDRE0 ) ) ) ;  // Check for an empty buffer by checking the UDRE0 bit
 }
 
 STATIC_INLINE bool
-serial_try_grab ( void )
+serial_empty ( void )
 {
   return 0 != ( UCSR0A & _BV ( UDRE0 ) ) ;
 }
