@@ -76,7 +76,7 @@ static error_t
 doit ( void )
 {
   int fd ;
-  void * buff ;
+  unsigned char * buff ;
   ssize_t cnt ;
   ssize_t tmp ;
 
@@ -94,7 +94,17 @@ doit ( void )
 
   while ( 0 < ( cnt = read ( fd , buff , 128 ) ) )
   {
-    for ( tmp = 0 ; tmp < cnt / 2 ; tmp += 1 ) fprintf ( stdout , "%hu\n" , ( ( unsigned short * ) buff ) [ tmp ] ) ;
+    for ( tmp = 0 ; tmp < cnt ; tmp += 1 )
+    {
+      if ( buff [ tmp ] & 0b00000001 ) fputs ( "1\n" , stdout ) ; else fputs ( "0\n" , stdout ) ;
+      if ( buff [ tmp ] & 0b00000010 ) fputs ( "1\n" , stdout ) ; else fputs ( "0\n" , stdout ) ;
+      if ( buff [ tmp ] & 0b00000100 ) fputs ( "1\n" , stdout ) ; else fputs ( "0\n" , stdout ) ;
+      if ( buff [ tmp ] & 0b00001000 ) fputs ( "1\n" , stdout ) ; else fputs ( "0\n" , stdout ) ;
+      if ( buff [ tmp ] & 0b00010000 ) fputs ( "1\n" , stdout ) ; else fputs ( "0\n" , stdout ) ;
+      if ( buff [ tmp ] & 0b00100000 ) fputs ( "1\n" , stdout ) ; else fputs ( "0\n" , stdout ) ;
+      if ( buff [ tmp ] & 0b01000000 ) fputs ( "1\n" , stdout ) ; else fputs ( "0\n" , stdout ) ;
+      if ( buff [ tmp ] & 0b10000000 ) fputs ( "1\n" , stdout ) ; else fputs ( "0\n" , stdout ) ;
+    }
   }
 
   if ( NULL != buff ) free ( buff ) ;

@@ -6,20 +6,17 @@
 
 #define STATIC_INLINE static inline __attribute__ (( __always_inline__ , __hot__ ))
 
-STATIC_INLINE unsigned char
-lock_acquire ( volatile unsigned char * const restrict next ,
-         const volatile unsigned char * const restrict serv )
+STATIC_INLINE void
+lock_acquire ( volatile unsigned char * const next )
 {
-  unsigned char tikt = ( * next ) ++ ;
-  while ( ( * serv ) - 1 != tikt ) ;
-  return tikt ;
+  ( * next ) = 1 ;
+  while ( ( * next ) ) ;
 }
 
 STATIC_INLINE void
-lock_release ( volatile unsigned char * const restrict serv ,
-         const volatile unsigned char * const restrict next )
+lock_release ( volatile unsigned char * const next )
 {
-  ( * serv ) = ( * next ) ;
+  ( * next ) = 0 ;
 }
 
 #undef STATIC_INLINE

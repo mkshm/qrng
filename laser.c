@@ -8,7 +8,7 @@
 int
 main ( void )
 {
-  disable_interrupts (  ) ;
+  /*disable_interrupts (  ) ;
   
   _delay_ms ( 50 ) ; // Allow devices voltage to come rise
 
@@ -40,7 +40,7 @@ main ( void )
     }
     
     rotary_step (  ) ;
-  }
+  }*/
 
   return 0 ;
 }
