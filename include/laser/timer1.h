@@ -3,11 +3,7 @@
 #define __UTIL_TIMER1_H__
 
 #include <avr/io.h>
-#include <avr/sleep.h>
-#include <avr/interrupt.h>
-#include <avr/pgmspace.h>
 #include <avr/sfr_defs.h>
-#include <avr/eeprom.h>
 
 static inline void __attribute__ (( __always_inline__ ))
 timer1_init ( void )
@@ -27,13 +23,15 @@ timer1_pwm_on ( void )
 {
   DDRB   |= _BV ( DDB2 ) ;
   TCCR1B |= _BV ( WGM13 ) ;
-  TCCR1A |= _BV ( WGM10 ) | _BV ( COM1B0 ) | _BV ( COM1B1 ) ;
+  TCCR1A |= _BV ( WGM10 ) ;
+  TCCR1A |= _BV ( COM1B1 ) ;
 }
 
 static inline void __attribute__ (( __always_inline__ ))
 timer1_pwm_off ( void )
 {
-  TCCR1A &= ~ ( _BV ( WGM10 ) | _BV ( COM1B0 ) | _BV ( COM1B1 ) ) ;
+  TCCR1A &= ~ ( _BV ( COM1B1 ) ) ;
+  TCCR1A &= ~ ( _BV ( WGM10 ) ) ;
   TCCR1B &= ~ ( _BV ( WGM13 ) ) ;
   DDRB   &= ~ ( _BV ( DDB2 ) ) ;
 }
@@ -44,10 +42,13 @@ timer1_freq ( const unsigned long freq )
   OCR1A = F_CPU / ( 2UL * 1UL * freq ) ;
 }
 
-static inline void __attribute__ (( __always_inline__ ))
+static inline unsigned short __attribute__ (( __always_inline__ ))
 timer1_duty ( const unsigned short duty )
 {
+  unsigned short ret ;
+  ret = OCR1B ;
   OCR1B = duty ;
+  return ret ;
 }
 
 static inline void __attribute__ (( __always_inline__ ))
@@ -79,13 +80,13 @@ timer1_disable_capture ( void )
 }
 
 static inline void __attribute__ (( __always_inline__ ))
-timer1_capture_falling ( void )
+timer1_capture_fall ( void )
 {
   TCCR1B &= ~ ( _BV ( ICES1 ) ) ;
 }
 
 static inline void __attribute__ (( __always_inline__ ))
-timer1_capture_rising ( void )
+timer1_capture_rise ( void )
 {
   TCCR1B |= _BV ( ICES1 ) ;
 }
