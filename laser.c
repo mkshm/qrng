@@ -3,23 +3,29 @@
 
 #include <laser/timer1.h>
 #include <laser/interrupt.h>
-#include <laser/rotary.h>
+#include <laser/serial.h>
+
+ISR ( USART_TX_vect )
+{
+  
+}
+
+ISR ( USART_RX_vect )
+{
+  
+}
 
 int
 main ( void )
 {
-  /*disable_interrupts (  ) ;
+  disable_interrupts (  ) ;
   
   _delay_ms ( 50 ) ; // Allow devices voltage to come rise
 
-  selector_init (  ) ;
+  timer1_init    (  ) ;
   interlock_init (  ) ;
-  rotary_init (  ) ;
-  timer1_init (  ) ;
   
-  timer1_pwm_on (  ) ;
-  timer1_freq ( 2000U ) ;
-  timer1_duty (    5U ) ;
+  enable_interrupts (  ) ;
 
   while ( 1 )
   {
@@ -32,15 +38,12 @@ main ( void )
       timer1_duty ( prev ) ;
     }
     
-    select = selector_ ;
-    
-    switch (  )
+    switch ( 1 )
     {
       
     }
     
-    rotary_step (  ) ;
-  }*/
+  }
 
   return 0 ;
 }
