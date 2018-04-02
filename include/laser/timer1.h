@@ -8,7 +8,6 @@
 static inline void __attribute__ (( __always_inline__ ))
 timer1_init ( void )
 {
-  TCNT1   = 0U ;
   TCCR1B |= _BV ( CS10  ) ;
 }
 
@@ -61,40 +60,6 @@ static inline void __attribute__ (( __always_inline__ ))
 timer1_disable_overflow ( void )
 {
   TIMSK1 &= ~ ( _BV ( TOIE1 ) ) ;
-}
-
-static inline void __attribute__ (( __always_inline__ ))
-timer1_enable_capture ( void )
-{
-  TCCR1B |= _BV ( ICNC1 ) ;
-  TCCR1B |= _BV ( ICES1 ) ;
-  TIMSK1 |= _BV ( ICIE1 ) ;
-}
-
-static inline void __attribute__ (( __always_inline__ ))
-timer1_disable_capture ( void )
-{
-  TIMSK1 &= ~ ( _BV ( ICIE1 ) ) ;
-  TCCR1B &= ~ ( _BV ( ICES1 ) ) ;
-  TCCR1B &= ~ ( _BV ( ICNC1 ) ) ;
-}
-
-static inline void __attribute__ (( __always_inline__ ))
-timer1_capture_fall ( void )
-{
-  TCCR1B &= ~ ( _BV ( ICES1 ) ) ;
-}
-
-static inline void __attribute__ (( __always_inline__ ))
-timer1_capture_rise ( void )
-{
-  TCCR1B |= _BV ( ICES1 ) ;
-}
-
-static inline void __attribute__ (( __always_inline__ ))
-timer1_capture_edge_swap ( void )
-{
-  TCCR1B ^= _BV ( ICES1 ) ;
 }
 
 #endif
