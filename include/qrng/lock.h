@@ -7,16 +7,16 @@
 #define STATIC_INLINE static inline __attribute__ (( __always_inline__ , __hot__ ))
 
 STATIC_INLINE void
-lock_acquire ( volatile unsigned char * const next )
+lock_acquire ( volatile bool * const next )
 {
-  ( * next ) = 1 ;
-  while ( ( * next ) ) ;
+  while ( ! ( * next ) ) ;
+  ( * next ) = false ;
 }
 
 STATIC_INLINE void
-lock_release ( volatile unsigned char * const next )
+lock_release ( volatile bool * const next )
 {
-  ( * next ) = 0 ;
+  ( * next ) = true ;
 }
 
 #undef STATIC_INLINE
