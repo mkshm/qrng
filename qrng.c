@@ -30,7 +30,6 @@ static volatile bool next = 0 ; /* Who is next in line? */
 
 ISR ( TIMER1_CAPT_vect ) // The actual Timer1 Input Capture Event Interrupt Service Routine
 {
-  prev . val = curr .val ;
   curr . val = ICR1 ; /* ICR1 is a special register which gets set to Timer1's counter TCNT1 upon entry */
   lock_release ( & next ) ;
 } 
@@ -61,6 +60,8 @@ main ( void )
   
   while ( 1 )
   {
+    prev . val = curr . val ;
+    
     lock_acquire ( & next ) ;
     
     mix . hi = prev . lo ^ curr . hi ;
