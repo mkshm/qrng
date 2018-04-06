@@ -38,6 +38,7 @@ int
 main ( void )
 {
   cast mix ;
+  cast temp ;
 
   disable_interrupts (  ) ;
 
@@ -60,18 +61,20 @@ main ( void )
   
   while ( 1 )
   {
-    prev . val = curr . val ;
-    
     lock_acquire ( & next ) ;
     
-    mix . hi = prev . lo ^ curr . hi ;
-    mix . lo = prev . hi ^ curr . lo ;
+    temp . val = curr . val ;
+    
+    mix . hi ^= prev . lo ^ temp . hi ;
+    mix . lo ^= prev . hi ^ temp . lo ;
     
     serial_wait (  ) ;         /* try and grab an empty buffer, then           */
     serial_send ( mix . lo ) ; /* send the byte using the empty buffer.        */
                                /* If this fails just move on to the next byte. */
     serial_empty (  ) ;        /* It shouldn't fail, unless the radioactive    */
     serial_send ( mix . hi ) ; /* source emits too quickly to keep up with     */
+    
+    prev . val = temp . val ;
   }
 
   return 0 ;
