@@ -32,7 +32,14 @@ ISR ( TIMER1_CAPT_vect ) // The actual Timer1 Input Capture Event Interrupt Serv
 {
   curr . val = ICR1 ; /* ICR1 is a special register which gets set to Timer1's counter TCNT1 upon entry */
   lock_release ( & next ) ;
-} 
+}
+
+ISR ( INT0_vect )
+{
+  curr . hi = TCNT0 ;
+  curr . lo = TCNT2 ;
+  lock_release ( & next ) ;
+}
 
 int
 main ( void )
