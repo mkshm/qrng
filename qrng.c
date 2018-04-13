@@ -1,7 +1,9 @@
 
 #include <util/delay.h>
 
+#include <qrng/timer0.h>
 #include <qrng/timer1.h>
+#incldue <qrng/timer2.h>
 #include <qrng/interrupt.h>
 #include <qrng/serial.h>
 #include <qrng/lock.h>
@@ -54,7 +56,9 @@ main ( void )
   /* Setup required facilities.  */
   
   serial_init (  ) ;
+  timer0_init (  ) ;
   timer1_init (  ) ;
+  timer2_init (  ) ;
   timer1_enable_capture  (  ) ;
 
   enable_interrupts (  ) ;
