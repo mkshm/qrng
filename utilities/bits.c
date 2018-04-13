@@ -1,3 +1,5 @@
+/* This program turns raw data into a string of 0s, and 1s, which can then be easily used*/
+
 
 #include <argp.h>
 #include <errno.h>

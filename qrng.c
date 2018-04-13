@@ -1,3 +1,5 @@
+/* Michael Free April 2018 */
+/* The goal of this code is to use the values of timers along with bitmixing to generate random numbers*/
 
 #include <util/delay.h>
 
@@ -26,7 +28,7 @@ typedef union __cast
 static volatile cast prev = { 0 } ;
 static volatile cast curr = { 0 } ;
 
-static volatile bool next = 0 ; /* Who is next in line? */
+static volatile bool next = false ; /* Who is next in line? */
 
 ISR ( TIMER1_CAPT_vect ) // The actual Timer1 Input Capture Event Interrupt Service Routine
 {
@@ -56,8 +58,8 @@ main ( void )
   
   lock_acquire ( & next ) ;
   
-  mix . hi = prev . lo ^ curr . hi ;
-  mix . lo = prev . hi ^ curr . lo ;
+  mix . hi = curr . hi ;
+  mix . lo = curr . lo ;
   
   while ( 1 )
   {
@@ -65,16 +67,19 @@ main ( void )
     
     temp . val = curr . val ;
     
-    mix . hi ^= prev . lo ^ temp . hi ;
     mix . lo ^= prev . hi ^ temp . lo ;
     
     serial_wait (  ) ;         /* try and grab an empty buffer, then           */
     serial_send ( mix . lo ) ; /* send the byte using the empty buffer.        */
+
+    prev . lo = temp . lo ;
+
+    mix . hi ^= prev . lo ^ temp . hi ;
                                /* If this fails just move on to the next byte. */
     serial_empty (  ) ;        /* It shouldn't fail, unless the radioactive    */
     serial_send ( mix . hi ) ; /* source emits too quickly to keep up with     */
     
-    prev . val = temp . val ;
+    prev . hi = temp . hi ;
   }
 
   return 0 ;
