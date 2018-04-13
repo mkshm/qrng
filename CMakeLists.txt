@@ -42,7 +42,7 @@ avr_disasm ( serial_bang )
 avr_upload ( qrng
   OPTIONS
     PROGRAMMER      arduino
-    PROGRAMMER_PORT /dev/ttyACM0
+    PROGRAMMER_PORT /dev/ttyUSB0
     PROGRAMMER_RATE 115200
 )
 avr_upload ( serial_bang

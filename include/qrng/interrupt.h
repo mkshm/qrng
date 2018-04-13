@@ -19,5 +19,12 @@ disable_interrupts ( void )
   cli (  ) ;
 }
 
+STATIC_INLINE
+enable_int0 ( void )
+{
+  EICRA |= ISC11 ;
+  EIMSK |= INT0  ;
+}
+
 #undef STATIC_INLINE
 #endif

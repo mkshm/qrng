@@ -61,6 +61,7 @@ main ( void )
   timer0_init (  ) ;
   timer1_init (  ) ;
   timer2_init (  ) ;
+  enable_int0 (  ) ;
   timer1_enable_capture  (  ) ;
 
   enable_interrupts (  ) ;
