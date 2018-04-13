@@ -3,7 +3,7 @@
 
 #include <qrng/timer0.h>
 #include <qrng/timer1.h>
-#incldue <qrng/timer2.h>
+#include <qrng/timer2.h>
 #include <qrng/interrupt.h>
 #include <qrng/serial.h>
 #include <qrng/lock.h>
