@@ -3,7 +3,9 @@
 
 #include <util/delay.h>
 
+#include <qrng/timer0.h>
 #include <qrng/timer1.h>
+#include <qrng/timer2.h>
 #include <qrng/interrupt.h>
 #include <qrng/serial.h>
 #include <qrng/lock.h>
@@ -34,7 +36,14 @@ ISR ( TIMER1_CAPT_vect ) // The actual Timer1 Input Capture Event Interrupt Serv
 {
   curr . val = ICR1 ; /* ICR1 is a special register which gets set to Timer1's counter TCNT1 upon entry */
   lock_release ( & next ) ;
-} 
+}
+
+ISR ( INT0_vect )
+{
+  curr . hi = TCNT0 ;
+  curr . lo = TCNT2 ;
+  lock_release ( & next ) ;
+}
 
 int
 main ( void )
@@ -49,7 +58,9 @@ main ( void )
   /* Setup required facilities.  */
   
   serial_init (  ) ;
+  timer0_init (  ) ;
   timer1_init (  ) ;
+  timer2_init (  ) ;
   timer1_enable_capture  (  ) ;
 
   enable_interrupts (  ) ;
