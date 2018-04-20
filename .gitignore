@@ -1,6 +1,6 @@
 build/*
 utilities/build/*
-test/build/*
+tests/build/*
 *.o
 *.i
 *.s
