@@ -1,1 +1,0 @@
-/usr/bin/cc     CMakeFiles/tst-freq.dir/tst-freq.c.o  -o tst-freq -lm 

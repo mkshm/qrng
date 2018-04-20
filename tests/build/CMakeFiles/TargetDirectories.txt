@@ -1,4 +1,0 @@
-/home/pi/projects/qrng/tests/build/CMakeFiles/edit_cache.dir
-/home/pi/projects/qrng/tests/build/CMakeFiles/rebuild_cache.dir
-/home/pi/projects/qrng/tests/build/CMakeFiles/tst-monte-3d.dir
-/home/pi/projects/qrng/tests/build/CMakeFiles/tst-freq.dir
