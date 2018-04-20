@@ -1,0 +1,38 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+..//tst-common.h
+argp.h
+-
+errno.h
+-
+fcntl.h
+-
+unistd.h
+-
+stdlib.h
+-
+stdio.h
+-
+string.h
+-
+math.h
+-
+
+/home/pi/projects/qrng/tests/tst-freq.c
+unistd.h
+-
+stdlib.h
+-
+string.h
+-
+math.h
+-
+tst-common.h
+-
+

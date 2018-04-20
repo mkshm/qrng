@@ -1,0 +1,1 @@
+/usr/bin/cc     CMakeFiles/tst-monte-3d.dir/tst-monte-3d.c.o  -o tst-monte-3d -lm 
