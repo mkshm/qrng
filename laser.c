@@ -21,6 +21,7 @@ ISR ( PCINT0_vect )
 int
 main ( void )
 {
+<<<<<<< HEAD
   unsigned short period ;
   unsigned short micros ;
   unsigned char  selection_cur ;
@@ -28,6 +29,11 @@ main ( void )
   unsigned char  intlocked_cur ;
 
   disable_interrupts (  ) ;
+=======
+  disable_interrupts (  ) ;/*
+  
+  _delay_ms ( 50 ) ; // Allow devices voltage to come rise
+>>>>>>> 26eafacd7f223a21bf5a5f7ace83ebb932691bc3
 
   _delay_ms ( 50 ) ; // Allow devices voltage to rise
 
@@ -62,6 +68,6 @@ main ( void )
       timer1_micros ( micros ) ;
     }
   }
-
+*/
   return 0 ;
 }
