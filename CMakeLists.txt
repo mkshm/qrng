@@ -10,7 +10,7 @@ cmake_minimum_required ( VERSION 3.6.0 FATAL_ERROR )
 set ( CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/cmake/avr.cmake" )
 set ( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake" )
 
-project ( AVR_PROJECT VERSION 0.0.1.0 LANGUAGES C CXX )
+project ( AVR_PROJECT VERSION 0.0.1.0 LANGUAGES C )
 
 avr_add_executable ( qrng qrng.c
   PROPERTIES
@@ -28,8 +28,8 @@ avr_add_executable ( serial_bang serial_bang.c
     MCU_FREQ        16000000
 )
 
-avr_target_include_directories ( qrng  ${CMAKE_SOURCE_DIR}/include )
-avr_target_include_directories ( laser ${CMAKE_SOURCE_DIR}/include )
+avr_target_include_directories ( qrng        ${CMAKE_SOURCE_DIR}/include )
+avr_target_include_directories ( laser       ${CMAKE_SOURCE_DIR}/include )
 avr_target_include_directories ( serial_bang ${CMAKE_SOURCE_DIR}/include )
 
 avr_disasm ( laser )
