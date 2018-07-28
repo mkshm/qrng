@@ -6,11 +6,12 @@
 #include <avr/sfr_defs.h>
 
 #define rotary_port  ( PINB )
+#define rotary_mask  ( _BV ( PB3 ) | _BV ( PB4 ) | _BV ( PB5 ) )
 #define rotary_press ( _BV ( PB3 ) )
 #define rotary_left  ( _BV ( PB4 ) )
 #define rotary_right ( _BV ( PB5 ) )
 
-static inline void __attribute__ (( __always_inline__ ))
+static inline void
 rotary_init ( void )
 {
   DDRB   &= ~ ( _BV ( DD3 ) | _BV ( DD4 ) | _BV ( DD5 ) ) ; /* Set pins 3, 4 and 5 to input */

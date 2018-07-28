@@ -6,9 +6,9 @@
 #include <avr/interrupt.h>
 
 #define intlck_port ( PINB )
-#define intlck_pin  ( _BV ( PB2 ) )
+#define intlck_mask ( _BV ( PB2 ) )
 
-static inline void __attribute__ (( __always_inline__ ))
+static inline void
 intlck_init ( void )
 {
   DDRB   &= ~ ( _BV ( DD2 ) ) ;

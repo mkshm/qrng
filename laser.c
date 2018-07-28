@@ -6,34 +6,28 @@
 #include <laser/interlock.h>
 #include <laser/rotary.h>
 
-static volatile unsigned char selection_new ;
-static volatile   signed char direction_new ;
-static volatile unsigned char intlocked_new ;
+static volatile unsigned char rotary_new = 0 ;
+static volatile unsigned char intlck_new = 0 ;
+
+static volatile unsigned char interrupted = 0 ;
 
 ISR ( PCINT0_vect )
 {
-  if ( rotary_port & rotary_left  ) { direction_new -- ; }
-  if ( rotary_port & rotary_right ) { direction_new ++ ; }
-  if ( rotary_port & rotary_press ) { selection_new ++ ; }
-  intlocked_new = intlck_port & intlck_pin ;
+  rotary_new |= rotary_port & rotary_mask ;
+  intlck_new |= intlck_port & intlck_mask ;
+
+  interrupted = ~ ( 0 ) ;
 }
 
 int
 main ( void )
 {
-<<<<<<< HEAD
   unsigned short period ;
   unsigned short micros ;
-  unsigned char  selection_cur ;
-    signed char  direction_cur ;
-  unsigned char  intlocked_cur ;
+  unsigned char  rotary_cur ;
+  unsigned char  intlck_cur ;
 
   disable_interrupts (  ) ;
-=======
-  disable_interrupts (  ) ;/*
-  
-  _delay_ms ( 50 ) ; // Allow devices voltage to come rise
->>>>>>> 26eafacd7f223a21bf5a5f7ace83ebb932691bc3
 
   _delay_ms ( 50 ) ; // Allow devices voltage to rise
 
@@ -49,15 +43,17 @@ main ( void )
 
   while ( 1 )
   {
-    direction_cur = direction_new ;
-    selection_cur = selection_new ;
-    intlocked_cur = intlocked_new ;
+    if ( ! interrupted ) continue ;
 
-    direction_new = 0 ;
-    selection_new = 0 ;
-    intlocked_new = 0 ;
+    interrupted = 0 ;
 
-    if ( 0 == intlocked_new )
+    rotary_cur = rotary_new ;
+    intlck_cur = intlck_new ;
+
+    rotary_new = 0 ;
+    intlck_new = 0 ;
+
+    if ( intlck_cur )
     {
       timer1_period ( 200u ) ;
       timer1_micros (   1u ) ;
@@ -68,6 +64,6 @@ main ( void )
       timer1_micros ( micros ) ;
     }
   }
-*/
+
   return 0 ;
 }
