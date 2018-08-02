@@ -15,14 +15,7 @@ timer1_init ( void )
   DDRB   |= _BV ( DDB2 ) ;
   TCCR1A |= _BV ( WGM10 ) ;
   TCCR1B |= _BV ( WGM13 ) | _BV ( CS10 ) ;
-}
-
-static inline void
-timer1_stop ( void )
-{
-  TCCR1B &= ~ ( _BV ( WGM13 ) | _BV ( CS10 ) ) ;
-  TCCR1A &= ~ ( _BV ( WGM10 ) ) ;
-  DDRB   &= ~ ( _BV ( DDB2 ) ) ;
+  TIMSK1 |= _BV ( TOIE1 ) ;
 }
 
 static inline void
@@ -41,18 +34,6 @@ static inline void
 timer1_micros ( const unsigned short us )
 {
   OCR1B = ( unsigned short ) ( ( unsigned long ) F_CPU / ( 2UL * 1000000UL ) ) * us ;
-}
-
-static inline void
-timer1_enable_overflow ( void )
-{
-  TIMSK1 |= _BV ( TOIE1 ) ;
-}
-
-static inline void
-timer1_disable_overflow ( void )
-{
-  TIMSK1 &= ~ ( _BV ( TOIE1 ) ) ;
 }
 
 #endif

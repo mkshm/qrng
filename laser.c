@@ -1,22 +1,27 @@
 
+#include <avr/sleep.h>
+#include <avr/interrupt.h>
+
 #include <util/delay.h>
 
 #include <laser/timer1.h>
-#include <laser/interrupt.h>
 #include <laser/interlock.h>
 #include <laser/rotary.h>
 
 static volatile unsigned char rotary_new = 0 ;
 static volatile unsigned char intlck_new = 0 ;
 
-static volatile unsigned char interrupted = 0 ;
+static volatile unsigned char ovf_new = 0 ;
 
 ISR ( PCINT0_vect )
 {
   rotary_new |= rotary_port & rotary_mask ;
   intlck_new |= intlck_port & intlck_mask ;
+}
 
-  interrupted = ~ ( 0 ) ;
+ISR ( TIMER1_OVF_vect )
+{
+  ovf_new ++ ;
 }
 
 int
@@ -27,7 +32,7 @@ main ( void )
   unsigned char  rotary_cur ;
   unsigned char  intlck_cur ;
 
-  disable_interrupts (  ) ;
+  cli (  ) ;
 
   _delay_ms ( 50 ) ; // Allow devices voltage to rise
 
@@ -39,19 +44,21 @@ main ( void )
   timer1_micros ( ( micros =   1u ) ) ; /* micros: [1,period] us */
   timer1_toggle (  ) ;
 
-  enable_interrupts (  ) ;
+  sei (  ) ;
+
+  set_sleep_mode ( SLEEP_MODE_IDLE ) ;
 
   while ( 1 )
   {
-    if ( ! interrupted ) continue ;
-
-    interrupted = 0 ;
+    sleep_enable (  ) ;
+    sleep_cpu (  ) ;
+    cli (  ) ;
+    sleep_disable (  ) ;
 
     rotary_cur = rotary_new ;
     intlck_cur = intlck_new ;
 
-    rotary_new = 0 ;
-    intlck_new = 0 ;
+    sei (  ) ;
 
     if ( intlck_cur )
     {

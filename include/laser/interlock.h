@@ -3,7 +3,6 @@
 #define __UTIL_INTERLOCK_H__
 
 #include <avr/io.h>
-#include <avr/interrupt.h>
 
 #define intlck_port ( PINB )
 #define intlck_mask ( _BV ( PB2 ) )
