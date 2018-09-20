@@ -1,4 +1,6 @@
 
+#include <avr/io.h>
+
 /*
  * This is a stripped down example to
  * configure ATmega328p serial I/O
