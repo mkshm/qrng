@@ -12,32 +12,15 @@ set ( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake" )
 
 project ( AVR_PROJECT VERSION 0.0.1.0 LANGUAGES C )
 
-avr_add_executable ( qrng qrng.c
+avr_add_executable ( qrng ${CMAKE_SOURCE_DIR}/src/qrng.c
   PROPERTIES
-    MCU             atmega328p
-    MCU_FREQ        16000000
-)
-avr_add_executable ( laser laser.c
-  PROPERTIES
-    MCU             atmega328p
-    MCU_FREQ        16000000
-)
-avr_add_executable ( serial_bang serial_bang.c
-  PROPERTIES
-    MCU             atmega328p
-    MCU_FREQ        16000000
+    MCU      atmega328p
+    MCU_FREQ 16000000
 )
 
-avr_target_include_directories ( qrng        ${CMAKE_SOURCE_DIR}/include )
-avr_target_include_directories ( laser       ${CMAKE_SOURCE_DIR}/include )
-avr_target_include_directories ( serial_bang ${CMAKE_SOURCE_DIR}/include )
+avr_target_include_directories ( qrng ${CMAKE_SOURCE_DIR}/include )
 
-avr_disasm ( laser )
 avr_disasm ( qrng )
-avr_disasm ( serial_bang )
-
-#avr_simulate ( laser )
-#avr_simulate ( qrng  )
 
 avr_upload ( qrng
   OPTIONS
@@ -45,9 +28,6 @@ avr_upload ( qrng
     PROGRAMMER_PORT /dev/ttyUSB0
     PROGRAMMER_RATE 115200
 )
-avr_upload ( serial_bang
-  OPTIONS
-    PROGRAMMER      arduino
-    PROGRAMMER_PORT /dev/ttyUSB0
-    PROGRAMMER_RATE 115200
-)
+
+add_subdirectory ( ${CMAKE_SOURCE_DIR}/tests     )
+add_subdirectory ( ${CMAKE_SOURCE_DIR}/utilities )

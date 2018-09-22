@@ -11,7 +11,6 @@
 #include <qrng/lock.h>
 
 #include <stdint.h>
-#include <stdbool.h>
 
 typedef uint32_t u32 ;
 typedef uint16_t u16 ;
@@ -30,18 +29,18 @@ typedef union __cast
 static volatile cast prev = { 0 } ;
 static volatile cast curr = { 0 } ;
 
-static volatile bool next = false ; /* Who is next in line? */
+static volatile _Bool next = 0 ; /* Who is next in line? */
 
 ISR ( TIMER1_CAPT_vect ) // The actual Timer1 Input Capture Event Interrupt Service Routine
 {
-  curr . val = ICR1 ; /* ICR1 is a special register which gets set to Timer1's counter TCNT1 upon entry */
+  curr . val = timer1_read_capture (  ) ; /* ICR1 is a special register which gets set to Timer1's counter TCNT1 upon entry */
   lock_release ( & next ) ;
 }
 
 ISR ( INT0_vect )
 {
-  curr . hi = TCNT0 ;
-  curr . lo = TCNT2 ;
+  curr . hi = timer0_read (  ) ;
+  curr . lo = timer2_read (  ) ;
   lock_release ( & next ) ;
 }
 
@@ -56,7 +55,7 @@ main ( void )
   _delay_ms ( 50 ) ; /* Wait for the processors voltage to rise.  */
 
   /* Setup required facilities.  */
-  
+
   serial_init (  ) ;
   timer0_init (  ) ;
   timer1_init (  ) ;
@@ -67,20 +66,20 @@ main ( void )
   enable_interrupts (  ) ;
 
   /* BEGIN */
-  
+
   lock_acquire ( & next ) ;
-  
+
   mix . hi = curr . hi ;
   mix . lo = curr . lo ;
-  
+
   while ( 1 )
   {
     lock_acquire ( & next ) ;
-    
+
     temp . val = curr . val ;
-    
+
     mix . lo ^= prev . hi ^ temp . lo ;
-    
+
     serial_wait (  ) ;         /* try and grab an empty buffer, then           */
     serial_send ( mix . lo ) ; /* send the byte using the empty buffer.        */
 
@@ -90,7 +89,7 @@ main ( void )
                                /* If this fails just move on to the next byte. */
     serial_empty (  ) ;        /* It shouldn't fail, unless the radioactive    */
     serial_send ( mix . hi ) ; /* source emits too quickly to keep up with     */
-    
+
     prev . hi = temp . hi ;
   }
 

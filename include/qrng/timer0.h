@@ -1,14 +1,19 @@
 
-#ifndef __UTIL_TIMER0_H__
-#define __UTIL_TIMER0_H__
+#ifndef __QRNG_TIMER0_H__
+#define __QRNG_TIMER0_H__
 
 #include <avr/io.h>
-#include <avr/sfr_defs.h>
 
-static inline void __attribute__ (( __always_inline__ ))
+static inline void
 timer0_init ( void )
 {
   TCCR0B |= _BV ( CS10  ) ;
+}
+
+static inline unsigned char
+timer0_read ( void )
+{
+  return TCNT0 ;
 }
 
 #endif

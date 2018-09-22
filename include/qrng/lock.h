@@ -1,23 +1,18 @@
 
-#ifndef __UTIL_LOCK_H__
-#define __UTIL_LOCK_H__
+#ifndef __QRNG_LOCK_H__
+#define __QRNG_LOCK_H__
 
-#include <stdbool.h>
-
-#define STATIC_INLINE static inline __attribute__ (( __always_inline__ , __hot__ ))
-
-STATIC_INLINE void
-lock_acquire ( volatile bool * const next )
+static inline void
+lock_acquire ( volatile _Bool * const next )
 {
   while ( ! ( * next ) ) ;
-  ( * next ) = false ;
+  ( * next ) = 0 ;
 }
 
-STATIC_INLINE void
-lock_release ( volatile bool * const next )
+static inline void
+lock_release ( volatile _Bool * const next )
 {
-  ( * next ) = true ;
+  ( * next ) = 1 ;
 }
 
-#undef STATIC_INLINE
 #endif
